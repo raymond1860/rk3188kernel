@@ -314,7 +314,7 @@
 
 
 
-#define gc2155_SENSOR_ORIENTATION 0
+#define gc2155_SENSOR_ORIENTATION 180
 
 //Sensor full resolution define
 #define ov7675_FULL_RESOLUTION     0x30000            // 0.3 megapixel
