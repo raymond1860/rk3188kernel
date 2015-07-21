@@ -118,7 +118,7 @@
                           cif_chl)\
     new_camera_device_ex(sensor_name,\
                         face,\
-                        INVALID_VALUE,\
+                        CONS(sensor_name,_SENSOR_ORIENTATION),\
                         INVALID_VALUE,\
                         INVALID_VALUE,\
                         INVALID_VALUE,\
@@ -244,6 +244,7 @@
 #define RK29_CAM_SENSOR_GC0308  gc0308
 #define RK29_CAM_SENSOR_GC0309  gc0309
 #define RK29_CAM_SENSOR_GC2015  gc2015
+#define RK29_CAM_SENSOR_GC2155  gc2155
 #define RK29_CAM_SENSOR_GC0328  gc0328
 #define RK29_CAM_SENSOR_GC0329  gc0329
 #define RK29_CAM_SENSOR_GC2035	gc2035
@@ -289,6 +290,7 @@
 #define RK29_CAM_SENSOR_NAME_GC0308  "gc0308"
 #define RK29_CAM_SENSOR_NAME_GC0309  "gc0309"
 #define RK29_CAM_SENSOR_NAME_GC2015  "gc2015"
+#define RK29_CAM_SENSOR_NAME_GC2155  "gc2155"
 #define RK29_CAM_SENSOR_NAME_GC0328  "gc0328"
 #define RK29_CAM_SENSOR_NAME_GC2035  "gc2035"
 #define RK29_CAM_SENSOR_NAME_GC0329  "gc0329"
@@ -309,6 +311,10 @@
 #define RK29_CAM_ISP_NAME_ICATCH7002_OV5693 "icatchov5693"
 #define RK29_CAM_ISP_NAME_ICATCH7002_OV8825 "icatchov8825" //zyt
 #define RK29_CAM_ISP_NAME_ICATCH7002_OV2720 "icatchov2720" //zyt
+
+
+
+#define gc2155_SENSOR_ORIENTATION 0
 
 //Sensor full resolution define
 #define ov7675_FULL_RESOLUTION     0x30000            // 0.3 megapixel
@@ -347,6 +353,7 @@
 #define siv120b_FULL_RESOLUTION     0x30000            // 0.3 megapixel
 #define siv121d_FULL_RESOLUTION     0x30000            // 0.3 megapixel
 #define sid130B_FULL_RESOLUTION     0x200000           // 2 megapixel    
+#define gc2155_FULL_RESOLUTION     0x200000           // 5 megapixel
 
 #if defined(CONFIG_SOC_CAMERA_HI253_INTERPOLATION_5M) 
 	#define hi253_FULL_RESOLUTION       0x500000			// 5 megapixel
@@ -404,7 +411,9 @@
 #define gc0309_I2C_ADDR             0x42
 #define gc0329_I2C_ADDR             0x62           
 #define gc2015_I2C_ADDR             0x60
-#define gc2035_I2C_ADDR             0x78            
+#define gc2035_I2C_ADDR             0x78
+#define gc2155_I2C_ADDR             0x78  
+
 
 #define siv120b_I2C_ADDR             INVALID_VALUE           
 #define siv121d_I2C_ADDR             INVALID_VALUE           
@@ -462,6 +471,7 @@
 #define gc0329_PWRDN_ACTIVE             0x01           
 #define gc2015_PWRDN_ACTIVE             0x01
 #define gc2035_PWRDN_ACTIVE             0x01            
+#define gc2155_PWRDN_ACTIVE             0x01  
 
 #define siv120b_PWRDN_ACTIVE             INVALID_VALUE           
 #define siv121d_PWRDN_ACTIVE             INVALID_VALUE           
@@ -534,6 +544,7 @@
 #define gc0329_PWRSEQ                   sensor_PWRSEQ_DEFAULT          
 #define gc2015_PWRSEQ                   sensor_PWRSEQ_DEFAULT
 #define gc2035_PWRSEQ                   sensor_PWRSEQ_DEFAULT            
+#define gc2155_PWRSEQ                   sensor_PWRSEQ_DEFAULT    
 
 #define siv120b_PWRSEQ                   sensor_PWRSEQ_DEFAULT         
 #define siv121d_PWRSEQ                   sensor_PWRSEQ_DEFAULT         

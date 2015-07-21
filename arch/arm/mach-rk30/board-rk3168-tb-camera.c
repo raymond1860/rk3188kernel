@@ -34,6 +34,7 @@ Comprehensive camera device registration:
                           
 */
 static struct rkcamera_platform_data new_camera[] = { 
+/*
     new_camera_device(RK29_CAM_SENSOR_OV5640,
                         back,
                         RK30_PIN3_PB5,
@@ -41,8 +42,9 @@ static struct rkcamera_platform_data new_camera[] = {
                         0,
                         4,
                         0),
-    new_camera_device(RK29_CAM_SENSOR_OV2659,
-                        front,
+                        */
+    new_camera_device(RK29_CAM_SENSOR_GC2155,
+                        back,
                         RK30_PIN3_PB4,
                         0,
                         0,
@@ -118,6 +120,31 @@ static struct rkcamera_platform_data new_camera[] = {
 #define CONFIG_SENSOR_480P_FPS_FIXED_02      15000
 #define CONFIG_SENSOR_SVGA_FPS_FIXED_02      15000
 #define CONFIG_SENSOR_720P_FPS_FIXED_02      30000
+
+#define CONFIG_SENSOR_02 RK29_CAM_SENSOR_GC2155                      /* back camera sensor 3 */
+#define CONFIG_SENSOR_IIC_ADDR_02 	    0x0
+#define CONFIG_SENSOR_CIF_INDEX_02                    0
+#define CONFIG_SENSOR_IIC_ADAPTER_ID_02    3
+#define CONFIG_SENSOR_ORIENTATION_02       180
+#define CONFIG_SENSOR_POWER_PIN_02         INVALID_GPIO
+#define CONFIG_SENSOR_RESET_PIN_02         INVALID_GPIO
+#define CONFIG_SENSOR_POWERDN_PIN_02       INVALID_GPIO
+#define CONFIG_SENSOR_FALSH_PIN_02         INVALID_GPIO
+#define CONFIG_SENSOR_POWERACTIVE_LEVEL_02 RK29_CAM_POWERACTIVE_L
+#define CONFIG_SENSOR_RESETACTIVE_LEVEL_02 RK29_CAM_RESETACTIVE_L
+#define CONFIG_SENSOR_POWERDNACTIVE_LEVEL_02 RK29_CAM_POWERDNACTIVE_H
+#define CONFIG_SENSOR_FLASHACTIVE_LEVEL_02 RK29_CAM_FLASHACTIVE_L
+
+#define CONFIG_SENSOR_QCIF_FPS_FIXED_02      15000
+#define CONFIG_SENSOR_240X160_FPS_FIXED_02   15000
+#define CONFIG_SENSOR_QVGA_FPS_FIXED_02      15000
+#define CONFIG_SENSOR_CIF_FPS_FIXED_02       15000
+#define CONFIG_SENSOR_VGA_FPS_FIXED_02       15000
+#define CONFIG_SENSOR_480P_FPS_FIXED_02      15000
+#define CONFIG_SENSOR_SVGA_FPS_FIXED_02      15000
+#define CONFIG_SENSOR_720P_FPS_FIXED_02      30000
+
+
 
 #define CONFIG_SENSOR_1 RK29_CAM_SENSOR_OV2659                      /* front camera sensor 0 */
 #define CONFIG_SENSOR_IIC_ADDR_1 	    0x00
@@ -210,8 +237,8 @@ static void rk_cif_power(struct rk29camera_gpio_res *res,int on)
 	  int camera_ioflag = res->gpio_flag;
 	  int camera_io_init = res->gpio_init;
 	  
-	ldo_28 = regulator_get(NULL, "ldo7");	// vcc28_cif
-	ldo_18 = regulator_get(NULL, "ldo1");	// vcc18_cif
+	ldo_28 = regulator_get(NULL, "act_ldo8");	// vcc28_cif
+	ldo_18 = regulator_get(NULL, "act_ldo3");	// vcc18_cif
 	if (ldo_28 == NULL || IS_ERR(ldo_28) || ldo_18 == NULL || IS_ERR(ldo_18)){
 		printk("get cif ldo failed!\n");
 		return;
