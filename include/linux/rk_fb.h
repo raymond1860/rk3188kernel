@@ -66,7 +66,11 @@
 #define RK_FBIOGET_DSP_ADDR     	0x4630
 #define RK_FBIOGET_LIST_STAT   		0X4631
 
-
+#ifdef CONFIG_FB_RK_UMP
+#define GET_UMP_SECURE_ID_BUF1 _IOWR('m', 311, unsigned int)
+#define GET_UMP_SECURE_ID_BUF2 _IOWR('m', 312, unsigned int)
+#define GET_UMP_SECURE_ID_RK_FB _IOWR('s', 100, unsigned int)
+#endif
 
 /**rk fb events**/
 #define RK_LF_STATUS_FC                  0xef
@@ -345,7 +349,14 @@ struct rk_fb_inf {
 	int video_mode;  //when play video set it to 1
 	struct workqueue_struct *workqueue;
 	struct delayed_work delay_work;
+#ifdef CONFIG_FB_RK_UMP
+	void *ump_wrapped_buffer[3];/**/
+#endif
 };
+#ifdef CONFIG_FB_RK_UMP
+extern int (*disp_get_ump_secure_id) (struct fb_info *info, struct rk_fb_inf *g_fbi,unsigned long arg, int buf);
+#endif
+
 extern int rk_fb_register(struct rk_lcdc_device_driver *dev_drv,
 	struct rk_lcdc_device_driver *def_drv,int id);
 extern int rk_fb_unregister(struct rk_lcdc_device_driver *dev_drv);

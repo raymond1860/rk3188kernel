@@ -62,6 +62,22 @@ static struct rk_fb_rgb def_rgb_16 = {
      transp: { offset: 0,  length: 0, },
 };
 
+//#ifndef CONFIG_SYNC
+#undef sync_fence_wait
+#undef sync_fence_put
+#undef sw_sync_timeline_inc
+#undef sw_sync_pt_create
+#undef sync_fence_create
+#undef sync_fence_install
+
+#define sync_fence_wait
+#define sync_fence_put
+#define sw_sync_timeline_inc
+#define sw_sync_pt_create
+#define sync_fence_create
+#define sync_fence_install
+#define sw_sync_timeline_create
+//#endif
 
 char * get_format_string(enum data_format format,char *fmt)
 {
@@ -780,6 +796,10 @@ static int rk_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
  	#endif
 	return 0;
 }
+#ifdef CONFIG_FB_RK_UMP
+int (*disp_get_ump_secure_id) (struct fb_info *info, struct rk_fb_inf *g_fbi,unsigned long arg, int buf);
+EXPORT_SYMBOL(disp_get_ump_secure_id);
+#endif
 
 static int rk_fb_get_list_stat(struct rk_lcdc_device_driver *dev_drv)
 {
@@ -823,6 +843,10 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 
 	unsigned int dsp_addr[2];
 	int list_stat;
+#ifdef CONFIG_FB_RK_UMP
+	int secure_id_buf_num = 0;
+#endif
+
 		
 	switch(cmd)
 	{
@@ -953,6 +977,22 @@ static int rk_fb_ioctl(struct fb_info *info, unsigned int cmd,unsigned long arg)
 		#endif 
 	#endif
 			break;
+
+#ifdef CONFIG_FB_RK_UMP
+		case GET_UMP_SECURE_ID_BUF2:	/* flow trough */
+			secure_id_buf_num++;
+		case GET_UMP_SECURE_ID_BUF1:	/* flow trough */
+			secure_id_buf_num++;
+		case GET_UMP_SECURE_ID_RK_FB:
+		{
+			printk("22222222%d\n",secure_id_buf_num);
+			struct rk_fb_inf *inf = dev_get_drvdata(info->device);
+			if (disp_get_ump_secure_id)
+				return disp_get_ump_secure_id(info, inf, arg,secure_id_buf_num);
+			else
+				return -ENOTSUPP;
+		}
+#endif
         	default:
 			dev_drv->ioctl(dev_drv,cmd,arg,layer_id);
             		break;
