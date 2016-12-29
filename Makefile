@@ -203,6 +203,9 @@ endif
 ifneq ($(wildcard ../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8),)
 CROSS_COMPILE   ?= ../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi-
 endif
+ifneq ($(wildcard ../tools/cross-compiler/gcc-linaro-arm-linux-gnueabihf-4.9),)
+CROSS_COMPILE   ?= ../tools/cross-compiler/gcc-linaro-arm-linux-gnueabihf-4.9/bin/arm-linux-gnueabihf-
+endif
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
