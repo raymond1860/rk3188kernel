@@ -5040,7 +5040,7 @@ void rockchip_wifi_exit_module(void)
 
 EXPORT_SYMBOL(rockchip_wifi_init_module);
 EXPORT_SYMBOL(rockchip_wifi_exit_module);
-/*
+
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0)
 #ifdef USE_LATE_INITCALL_SYNC
 late_initcall_sync(dhd_module_init);
@@ -5052,7 +5052,7 @@ module_init(dhd_module_init);
 #endif // LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 0)
 
 module_exit(dhd_module_cleanup);
-*/
+
 
 /*
  * OS specific functions required to implement DHD driver in OS independent way
