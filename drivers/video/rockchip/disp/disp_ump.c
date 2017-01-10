@@ -21,7 +21,7 @@
 #error This file should not be built without UMP enabled
 #endif
 
-#include <ump/ump_kernel_interface_ref_drv.h>
+#include "ump_kernel_interface_ref_drv.h"
 #include <linux/rk_fb.h>
 #include <asm/uaccess.h>
 
