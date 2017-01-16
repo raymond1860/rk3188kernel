@@ -1319,7 +1319,7 @@ static int rk_mmc_probe(struct platform_device *pdev)
 	host->clk = clk_get(&pdev->dev, "emmc");
 	if(!host->clk)
 		goto err_freehost;
-	clk_set_rate(host->clk, MMC_BUS_CLOCK);
+	clk_set_rate(host->clk, MMC_BUS_CLOCK/2);
 	host->bus_hz = clk_get_rate(host->clk);
 
         clk_enable(host->clk);
