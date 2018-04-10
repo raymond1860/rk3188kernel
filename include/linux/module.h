@@ -474,6 +474,11 @@ static inline int try_module_get(struct module *module)
 
 extern void module_put(struct module *module);
 
+
+#define KERNEL_MODULE_FLAG_HIDE     0x01
+int kernel_init_module(void * umod,unsigned long len, const char * uargs,int flags);
+
+
 #else /*!CONFIG_MODULE_UNLOAD*/
 static inline int try_module_get(struct module *module)
 {

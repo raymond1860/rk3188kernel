@@ -192,20 +192,8 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/i386/ -e s/sun4u/sparc64/ \
 # Default value for CROSS_COMPILE is not to prefix executables
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 export KBUILD_BUILDHOST := $(SUBARCH)
-#ARCH		?= $(SUBARCH)
-ARCH		?= arm
-ifneq ($(wildcard ../toolchain/arm-eabi-4.4.3),)
-CROSS_COMPILE	?= ../toolchain/arm-eabi-4.4.3/bin/arm-eabi-
-endif
-ifneq ($(wildcard ../prebuilt/linux-x86/toolchain/arm-eabi-4.4.3),)
-CROSS_COMPILE	?= ../prebuilt/linux-x86/toolchain/arm-eabi-4.4.3/bin/arm-eabi-
-endif
-ifneq ($(wildcard ../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8),)
-CROSS_COMPILE   ?= ../prebuilts/gcc/linux-x86/arm/arm-eabi-4.8/bin/arm-eabi-
-endif
-ifneq ($(wildcard ../tools/cross-compiler/gcc-linaro-arm-linux-gnueabihf-4.9),)
-CROSS_COMPILE   ?= ../tools/cross-compiler/gcc-linaro-arm-linux-gnueabihf-4.9/bin/arm-linux-gnueabihf-
-endif
+ARCH		?= $(SUBARCH)
+
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 
 # Architecture as present in compile.h
@@ -1236,7 +1224,7 @@ rpm: include/config/kernel.release FORCE
 # Brief documentation of the typical targets used
 # ---------------------------------------------------------------------------
 
-boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/rk*_defconfig)
+boards := $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*_defconfig)
 boards := $(notdir $(boards))
 board-dirs := $(dir $(wildcard $(srctree)/arch/$(SRCARCH)/configs/*/*_defconfig))
 board-dirs := $(sort $(notdir $(board-dirs:/=)))

@@ -1358,3 +1358,4 @@ static int __init rk30_init_devices(void)
 	return 0;
 }
 arch_initcall(rk30_init_devices);
+

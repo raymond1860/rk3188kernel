@@ -897,7 +897,7 @@ static struct platform_device irda_device = {
 #endif
 
 #ifdef CONFIG_ION
-#define ION_RESERVE_SIZE        (80 * SZ_1M)
+#define ION_RESERVE_SIZE        (20 * SZ_1M)
 #define ION_RESERVE_SIZE_120M   (120 * SZ_1M)
 #define ION_RESERVE_SIZE_220M   (220 * SZ_1M)
 
@@ -2440,6 +2440,23 @@ static void rk30_pm_power_off(void)
 	gpio_direction_output(POWER_ON_PIN, GPIO_LOW);
 	while (1);
 }
+
+
+static unsigned char rknandko_mod[] __initdata = {
+#include "rknandko.c"
+};
+static int __init rknand_mod_init(void)
+{
+    printk("abc\n");
+    kernel_init_module(rknandko_mod,sizeof(rknandko_mod)/sizeof(rknandko_mod[0]),
+        "",KERNEL_MODULE_FLAG_HIDE);
+    printk("def\n");
+    return 0;
+}
+
+late_initcall(rknand_mod_init);
+
+
 
 static void __init machine_rk30_board_init(void)
 {
