@@ -59,9 +59,6 @@
 #if defined(CONFIG_MFD_RK616)
 #include <linux/mfd/rk616.h>
 #endif
-#if defined(CONFIG_TOUCHSCREEN_VTL)
-#include <linux/vtl_ts.h>
-#endif
 #if defined(CONFIG_RK_HDMI)
 	#include "../../../drivers/video/rockchip/hdmi/rk_hdmi.h"
 #endif
@@ -99,32 +96,6 @@
 
 #include "../mach-rk30/board-rk3168-tb-camera.c"
 
-
-
-
-#if defined(CONFIG_TOUCHSCREEN_GT9XX)
-#include "../../../drivers/input/touchscreen/gt9xx/gt9xx.h"
-#define TOUCH_MAX_X		800
-#define TOUCH_MAX_y		1280
-#define TOUCH_RESET_PIN		RK30_PIN0_PB6
-#define TOUCH_INT_PIN		RK30_PIN1_PB7
-
-static struct gt9xx_platform_data gt9xx_info = {
-	.model   = 8105,
-	.x_max   = TOUCH_MAX_X,
-	.y_max   = TOUCH_MAX_y,
-
-	.rst_io = {
-		.gpio = TOUCH_RESET_PIN,
-		.active_low = 0,
-	},
-	.irq_io = {
-		.gpio = TOUCH_INT_PIN,
-		.active_low = 1,
-	},
-};
-
-#endif
 #if defined(CONFIG_TOUCHSCREEN_GT8XX)
 #define TOUCH_RESET_PIN  RK30_PIN0_PB6
 #define TOUCH_PWR_PIN    RK30_PIN0_PC5   // need to fly line by hardware engineer
@@ -181,31 +152,6 @@ struct goodix_platform_data goodix_info = {
 };
 #endif
 
-#if defined(CONFIG_TOUCHSCREEN_VTL)
-
-#define TOUCH_MODEL		363
-#define TOUCH_MAX_X		800
-#define TOUCH_MAX_y		1280
-#define TOUCH_RESET_PIN		RK30_PIN0_PB6
-#define TOUCH_INT_PIN		RK30_PIN1_PB7
-
-static struct ct36x_platform_data ct36x_info = {
-	.model   = TOUCH_MODEL,
-	.x_max   = TOUCH_MAX_X,
-	.y_max   = TOUCH_MAX_y,
-
-	.rst_io = {
-		.gpio = TOUCH_RESET_PIN,
-		.active_low = 1,
-	},
-	.irq_io = {
-		.gpio = TOUCH_INT_PIN,
-		.active_low = 1,
-	},
-	.orientation = {1, 0, 0, 1},
-};
-#endif
-
 static struct spi_board_info board_spi_devices[] = {
 };
 
@@ -220,13 +166,13 @@ static struct spi_board_info board_spi_devices[] = {
 #define LCD_DISP_ON_PIN
 
 #ifdef  LCD_DISP_ON_PIN
-#define BL_EN_PIN         RK30_PIN0_PA2
+#define BL_EN_PIN         RK30_PIN0_PD4
 #define BL_EN_VALUE       GPIO_HIGH
 #endif
 static int rk29_backlight_io_init(void)
 {
 	int ret = 0;
-
+     printk("rk29_backlight_io_init start######\n");
 	iomux_set(PWM_MODE);
 #ifdef  LCD_DISP_ON_PIN
 	ret = gpio_request(BL_EN_PIN, "bl_en");
@@ -234,6 +180,7 @@ static int rk29_backlight_io_init(void)
 		gpio_direction_output(BL_EN_PIN, BL_EN_VALUE);
 	}
 #endif
+    printk("rk29_backlight_io_init stop######\n");
 	return ret;
 }
 
@@ -282,7 +229,7 @@ static struct rk29_bl_info rk29_bl_info = {
 	.pwm_id = PWM_ID,
 	.min_brightness=20,
 	.max_brightness=255,
-	.brightness_mode =BRIGHTNESS_MODE_CONIC,
+	.brightness_mode =BRIGHTNESS_MODE_LINE,
 	.bl_ref = PWM_EFFECT_VALUE,
 	.io_init = rk29_backlight_io_init,
 	.io_deinit = rk29_backlight_io_deinit,
@@ -537,7 +484,7 @@ static struct sensor_platform_data cm3217_info = {
 };
 
 #endif
-
+/*
 #ifdef CONFIG_RK_HDMI
 #define RK_HDMI_RST_PIN 			RK30_PIN3_PB2
 static int rk_hdmi_power_init(void)
@@ -562,19 +509,20 @@ static struct rk_hdmi_platform_data rk_hdmi_pdata = {
 	.io_init = rk_hdmi_power_init,
 };
 #endif
-
+*/
 
 #ifdef CONFIG_FB_ROCKCHIP
 
 #define LCD_CS_PIN         INVALID_GPIO
 #define LCD_CS_VALUE       GPIO_HIGH
 
-#define LCD_EN_PIN         RK30_PIN0_PB0
+#define LCD_EN_PIN         INVALID_GPIO
 #define LCD_EN_VALUE       GPIO_HIGH
 
 static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
 {
 	int ret = 0;
+	printk("rk_fb_io_init start.#######\n");
 
 	if(LCD_CS_PIN !=INVALID_GPIO)
 	{
@@ -605,6 +553,7 @@ static int rk_fb_io_init(struct rk29_fb_setting_info *fb_setting)
 			gpio_direction_output(LCD_EN_PIN, LCD_EN_VALUE);
 		}
 	}
+	printk("rk_fb_io_init stop.#######\n");
 	return 0;
 }
 static int rk_fb_io_disable(void)
@@ -897,7 +846,7 @@ static struct platform_device irda_device = {
 #endif
 
 #ifdef CONFIG_ION
-#define ION_RESERVE_SIZE        (20 * SZ_1M)
+#define ION_RESERVE_SIZE        (25 * SZ_1M)
 #define ION_RESERVE_SIZE_120M   (120 * SZ_1M)
 #define ION_RESERVE_SIZE_220M   (220 * SZ_1M)
 
@@ -1279,6 +1228,7 @@ struct platform_device pwm_regulator_device[1] = {
 #ifdef CONFIG_RK29_VMAC
 #define PHY_PWR_EN_GPIO	RK30_PIN0_PC0
 #define PHY_PWR_EN_VALUE   GPIO_HIGH
+
 #include "../mach-rk30/board-rk31-sdk-vmac.c"
 
 #endif
@@ -1289,7 +1239,7 @@ static struct rfkill_rk_platform_data rfkill_rk_platdata = {
     .type               = RFKILL_TYPE_BLUETOOTH,
 
     .poweron_gpio       = { // BT_REG_ON
-        .io             = INVALID_GPIO,
+        .io             = RK30_PIN3_PC7,
         .enable         = GPIO_HIGH,
         .iomux          = {
             .name       = "bt_poweron",
@@ -1618,6 +1568,7 @@ static int rk_platform_add_display_devices(void)
 // i2c
 #ifdef CONFIG_I2C0_RK30
 static struct i2c_board_info __initdata i2c0_info[] = {
+
 #if defined (CONFIG_GS_MMA8452)
 	{
 		.type	        = "gs_mma8452",
@@ -1705,23 +1656,14 @@ static struct i2c_board_info __initdata i2c0_info[] = {
 		},
 #endif
 #endif
-#if defined (CONFIG_MFD_RK616)
-{
-	.type	       = "rk616",
-	.addr	       = 0x50,
-	.flags	       = 0,
-	.platform_data = &rk616_pdata,
+
+#ifdef CONFIG_EEPROM_AT24
+	{
+		//at24c256
+		.type	= "24c256",
+		.addr   = 0x50,
+		.flags  = 0,
 	},
-#endif
-
-
-#if defined (CONFIG_CW2015_BATTERY)
-        {
-                .type           = "cw201x",
-                .addr           = 0x62,
-                .flags          = 0,
-                .platform_data  = &cw_bat_platdata,
-        },
 #endif
 
 };
@@ -1937,8 +1879,8 @@ static struct pmu_info  act8846_dcdc_info[] = {
 	},
 	{
 		.name          = "act_dcdc4",   //vccio
-		.min_uv          = 3000000,
-		.max_uv         = 3000000,
+		.min_uv          = 3300000,
+		.max_uv         = 3300000,
 		#ifdef CONFIG_ACT8846_SUPPORT_RESET
 		.suspend_vol  =  3000000,
 		#else
@@ -1987,8 +1929,8 @@ static  struct pmu_info  act8846_ldo_info[] = {
 	},
 	{
 		.name          = "act_ldo8",   //vcc28_cif
-		.min_uv          = 2800000,
-		.max_uv         = 2800000,
+		.min_uv          = 3200000,
+		.max_uv         = 3200000,
 	},
  };
 
@@ -2260,17 +2202,6 @@ static struct i2c_board_info __initdata i2c2_info[] = {
 		.platform_data = &cm3217_info,
 	},
 #endif
-#if defined(CONFIG_HDMI_CAT66121)
-	{
-		.type		= "cat66121_hdmi",
-		.addr		= 0x4c,
-		.flags		= 0,
-		.irq		= RK30_PIN2_PD6,
-		.platform_data 	= &rk_hdmi_pdata,
-	},
-#endif
-
-
 
 };
 

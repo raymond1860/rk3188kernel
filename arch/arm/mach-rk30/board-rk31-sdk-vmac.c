@@ -1,6 +1,7 @@
 #define grf_readl(offset)	readl_relaxed(RK30_GRF_BASE + offset)
 #define grf_writel(v, offset)	do { writel_relaxed(v, RK30_GRF_BASE + offset); dsb(); } while (0)
 
+
 static int rk30_vmac_register_set(void)
 {
 	//config rk30 vmac as rmii
@@ -8,11 +9,13 @@ static int rk30_vmac_register_set(void)
 	return 0;
 }
 
+
 static int rk30_rmii_io_init(void)
 {
 	int err;
 	long val;
 	printk("enter %s ",__func__);
+	//iomux_set(GPIO3_A0);//rest pin
 	iomux_set(GPIO0_C0);//power pwr
 	iomux_set(GPIO3_D2);//int
 	
@@ -41,6 +44,9 @@ static int rk30_rmii_io_init(void)
 	//phy power down
 	gpio_direction_output(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
 	gpio_set_value(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
+
+
+	printk("rk30_rmii_io_init###############add by steven\n");
 
 	return 0;
 }
@@ -76,6 +82,7 @@ static int rk30_rmii_power_control(int enable)
         	iomux_set(RMII_TXD1);
         	iomux_set(RMII_TXEN);
         	iomux_set(RMII_CLKOUT);
+        	
 	
 		gpio_direction_output(PHY_PWR_EN_GPIO, PHY_PWR_EN_VALUE);
 		gpio_set_value(PHY_PWR_EN_GPIO, PHY_PWR_EN_VALUE);
