@@ -29,7 +29,7 @@ static int rk30_rmii_io_init(void)
 	iomux_set(RMII_TXD0);
 	iomux_set(RMII_TXD1);
 	iomux_set(RMII_TXEN);
-	iomux_set(RMII_CLKOUT);
+	iomux_set(RMII_CLKIN);
 
 	//rk3188 gpio3 and sdio drive strength , 
 	val = grf_readl(GRF_IO_CON3);
@@ -45,6 +45,11 @@ static int rk30_rmii_io_init(void)
 	gpio_direction_output(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
 	gpio_set_value(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
 
+	err = gpio_request(RK30_PIN3_PA0, "rmii_rst");
+	if (err) {
+		return -1;
+	}
+	gpio_direction_input(RK30_PIN3_PA0);
 
 	printk("rk30_rmii_io_init###############add by steven\n");
 
@@ -81,16 +86,21 @@ static int rk30_rmii_power_control(int enable)
         	iomux_set(RMII_TXD0);
         	iomux_set(RMII_TXD1);
         	iomux_set(RMII_TXEN);
-        	iomux_set(RMII_CLKOUT);
+        	iomux_set(RMII_CLKIN);
         	
-	
-		gpio_direction_output(PHY_PWR_EN_GPIO, PHY_PWR_EN_VALUE);
-		gpio_set_value(PHY_PWR_EN_GPIO, PHY_PWR_EN_VALUE);
+	    msleep(150);
+		gpio_direction_output(RK30_PIN3_PA0, GPIO_LOW);
+		gpio_set_value(RK30_PIN3_PA0, GPIO_LOW);
+        msleep(150);
+		gpio_direction_output(RK30_PIN3_PA0, GPIO_HIGH);
+		gpio_set_value(RK30_PIN3_PA0, GPIO_HIGH);
 
 		//gpio reset		
 	}else {
+#if 0
 		gpio_direction_output(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
 		gpio_set_value(PHY_PWR_EN_GPIO, !PHY_PWR_EN_VALUE);
+#endif
 	}
 	return 0;
 }
