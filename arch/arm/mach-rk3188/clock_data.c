@@ -2106,7 +2106,7 @@ static struct clk *clk_mac_ref_parents[2] = {&clk_mac_pll_div, &rmii_clkin};
 
 static struct clk clk_mac_ref = {
 	.name		= "mac_ref",
-	.parent		= &clk_mac_pll_div,
+	.parent		= &rmii_clkin,
 	.set_rate	= clksel_mac_ref_set_rate,
 	.clksel_con 	= CRU_CLKSELS_CON(21),
 	CRU_SRC_SET(0x1, 4),
@@ -3102,6 +3102,9 @@ static void __init rk30_init_enable_clocks(void)
 	clk_enable_nolock(&clk_hsicphy_480m);
 	clk_enable_nolock(&clk_hsicphy_12m);
 	#endif	
+	cru_writel(0x100b10, CRU_CLKSELS_CON(21));
+	//clk_set_parent_nolock(&clk_mac_ref, &rmii_clkin);
+	//clk_set_rate_nolock(&clk_mac_ref, 20 * MHZ);
 	
 	#if 0
 	clk_enable_nolock(&rmii_clkin);
